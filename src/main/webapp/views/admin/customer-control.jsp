@@ -33,7 +33,7 @@
                     <th>Ảnh đại diện</th>
                     <th>Tình trạng xác thực</th>
                     <th>Đăng kí lúc</th>
-<%--                    <th>Action</th>--%>
+                    <th>Chặn</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -47,16 +47,21 @@
                     <td><a href="<%=customers.get(i).avatar.startsWith("http") || customers.get(i).avatar.startsWith("https") ? customers.get(i).avatar : request.getContextPath() + "/" + customers.get(i).avatar%>">Xem ảnh</a></td>
                     <td><%=customers.get(i).is_verified ? "<span style='color: green'>Đã xác thực</span>" : "<span style='color: red'>Chưa xác thực</span>"%></td>
                     <td><%=customers.get(i).created_at%></td>
-                    <%--<td>
+                    <td>
                         <div class="row">
-                            <div class="col-6">
-                                <button class="btn btn-success">AAAAAAA</button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-success">BBBBBBB</button>
-                            </div>
+                            <% if (customers.get(i).is_blocked) { %>
+                            <a href="<%=request.getContextPath()%>/admin/block-customer?customer_id=<%=customers.get(i).id%>">
+                                <button class="btn btn-success">Bỏ chặn</button>
+                            </a>
+                            <% } else { %>
+                                <div class="col-6">
+                                    <a href="<%=request.getContextPath()%>/admin/block-customer?customer_id=<%=customers.get(i).id%>">
+                                        <button class="btn btn-danger">Chặn</button>
+                                    </a>
+                                </div>
+                            <% } %>
                         </div>
-                    </td>--%>
+                    </td>
                 </tr>
                 <% } %>
                 </tbody>

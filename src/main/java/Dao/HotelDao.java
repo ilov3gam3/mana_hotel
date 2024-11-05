@@ -49,7 +49,9 @@ public class HotelDao {
                         resultSet.getString("address"),
                         resultSet.getString("gg_map_link"),
                         resultSet.getString("password"),
-                        resultSet.getTimestamp("created_at")
+                        resultSet.getTimestamp("created_at"),
+                        resultSet.getBoolean("is_verified"),
+                        resultSet.getBoolean("is_blocked")
                 ));
             }
             return hotels;
@@ -98,5 +100,11 @@ public class HotelDao {
 
     public static boolean updateAvatar(String avatar, String id) {
         return DBContext.executeUpdate("update hotels set avatar = ? where id = ?", new String[]{avatar, id});
+    }
+    public static boolean changeVerifyHotel(String hotel_id){
+        return DBContext.executeUpdate("update hotels set is_verified = ~is_verified where id = ?", new String[]{hotel_id});
+    }
+    public static boolean changeBlockHotel(String hotel_id){
+        return DBContext.executeUpdate("update hotels set is_blocked = ~is_blocked where id = ?", new String[]{hotel_id});
     }
 }

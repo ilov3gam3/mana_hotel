@@ -63,7 +63,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link collapsed" href="<%=request.getContextPath() + "/logout"%>>">
+            <a class="nav-link collapsed" href="<%=request.getContextPath() + "/logout"%>">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Đăng xuất</span>
             </a>
@@ -100,7 +100,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link collapsed" href="<%=request.getContextPath() + "/logout"%>>">
+            <a class="nav-link collapsed" href="<%=request.getContextPath() + "/logout"%>">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Đăng xuất</span>
             </a>

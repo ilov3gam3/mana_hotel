@@ -98,7 +98,7 @@
                     <th>Nhúng bản đồ</th>
                     <th>Ảnh đại diện</th>
                     <th>Tạo lúc</th>
-                    <%--<th>Action</th>--%>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -112,16 +112,34 @@
                     <td><%=hotels.get(i).gg_map_link%></td>
                     <td><a href="<%=hotels.get(i).avatar.startsWith("http") || hotels.get(i).avatar.startsWith("https") ? hotels.get(i).avatar : request.getContextPath() + "/" + hotels.get(i).avatar%>">Xem ảnh</a></td>
                     <td><%=hotels.get(i).created_at%></td>
-                    <%--<td>
-                        <div class="row">
+                    <td>
+                        <div class="row m-1">
+                            <% if (hotels.get(i).is_verified) { %>
+                            <a href="<%=request.getContextPath()%>/admin/verrify-hotel?hotel_id=<%=hotels.get(i).id%>">
+                                <button class="btn btn-success">Hủy xác nhận</button>
+                            </a>
+                            <% } else { %>
                             <div class="col-6">
-                                <button class="btn btn-success">AAAAAAA</button>
+                                <a href="<%=request.getContextPath()%>/admin/verrify-hotel?hotel_id=<%=hotels.get(i).id%>">
+                                    <button class="btn btn-danger">Xác nhận</button>
+                                </a>
                             </div>
-                            <div class="col-6">
-                                <button class="btn btn-success">BBBBBBB</button>
-                            </div>
+                            <% } %>
                         </div>
-                    </td>--%>
+                        <div class="row m-1">
+                            <% if (hotels.get(i).is_blocked) { %>
+                            <a href="<%=request.getContextPath()%>/admin/block-hotel?hotel_id=<%=hotels.get(i).id%>">
+                                <button class="btn btn-success">Bỏ chặn</button>
+                            </a>
+                            <% } else { %>
+                            <div class="col-6">
+                                <a href="<%=request.getContextPath()%>/admin/block-hotel?hotel_id=<%=hotels.get(i).id%>">
+                                    <button class="btn btn-danger">Chặn</button>
+                                </a>
+                            </div>
+                            <% } %>
+                        </div>
+                    </td>
                 </tr>
                 <% } %>
                 </tbody>

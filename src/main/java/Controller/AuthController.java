@@ -8,6 +8,7 @@ import Model.Customer;
 import Model.Hotel;
 import Util.Config;
 import Util.Mail;
+import Util.UploadImage;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -15,12 +16,14 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -46,16 +49,21 @@ public class AuthController {
                     req.getSession().setAttribute("mess", "warning|Tài khoản chưa được kích hoạt");
                     resp.sendRedirect(req.getContextPath() + "/login");
                 } else {
-                    String password = req.getParameter("password");
-                    if (BCrypt.checkpw(password, customer.password)){
-                        req.getSession().setAttribute("mess", "success|Đăng nhập thành công.");
-                        req.getSession().setAttribute("customer", customer.id);
-                        req.getSession().removeAttribute("admin");
-                        req.getSession().removeAttribute("hotel");
-                        resp.sendRedirect(req.getContextPath() + "/");
-                    } else {
-                        req.getSession().setAttribute("mess", "warning|Sai email hoặc mật khẩu");
+                    if (customer.is_blocked){
+                        req.getSession().setAttribute("mess", "warning|Tài khoản đã bị chặn");
                         resp.sendRedirect(req.getContextPath() + "/login");
+                    } else {
+                        String password = req.getParameter("password");
+                        if (BCrypt.checkpw(password, customer.password)){
+                            req.getSession().setAttribute("mess", "success|Đăng nhập thành công.");
+                            req.getSession().setAttribute("customer", customer.id);
+                            req.getSession().removeAttribute("admin");
+                            req.getSession().removeAttribute("hotel");
+                            resp.sendRedirect(req.getContextPath() + "/");
+                        } else {
+                            req.getSession().setAttribute("mess", "warning|Sai email hoặc mật khẩu");
+                            resp.sendRedirect(req.getContextPath() + "/login");
+                        }
                     }
                 }
             }
@@ -299,6 +307,35 @@ public class AuthController {
             } else {
                 req.getSession().setAttribute("mess", "error|Đăng nhập không thành công.");
                 resp.sendRedirect(req.getContextPath() + "/hotel/login");
+            }
+        }
+    }
+    @WebServlet("/hotel-register")
+    @MultipartConfig(
+            fileSizeThreshold = 1024 * 1024,
+            maxFileSize = 1024 * 1024 * 50,
+            maxRequestSize = 1024 * 1024 * 50
+    )
+    public static class HotelRegister extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.getRequestDispatcher("/views/authentication/hotel-register.jsp").forward(req, resp);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String name = req.getParameter("name");
+            String email = req.getParameter("email");
+            String password = req.getParameter("password");
+            String address = req.getParameter("address");
+            String gg_map_link = req.getParameter("gg_map_link");
+            String newFileName = UploadImage.saveImage(req, "avatar");
+            if (HotelDao.createNewHotel(name, email, newFileName, password, address, gg_map_link)){
+                req.getSession().setAttribute("mess", "success|Thêm mới hotel thành công, chờ admin duyệt.");
+                resp.sendRedirect(req.getContextPath() + "/hotel-register");
+            } else {
+                req.getSession().setAttribute("mess", "error|Đã có lỗi xảy ra.");
+                resp.sendRedirect(req.getContextPath() + "/hotel-register");
             }
         }
     }

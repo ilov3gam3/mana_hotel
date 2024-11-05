@@ -61,14 +61,17 @@
                                     <div class="col-12">
                                         <label for="name" class="form-label">Phone</label>
                                         <input type="tel" name="phone" class="form-control" id="phone" required>
-                                        <div class="invalid-feedback">Please, enter your name!</div>
+                                        <div class="invalid-feedback">Vui lòng nhập số điện thoại</div>
                                     </div>
 
                                     <div class="col-12">
-                                        <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                                        <button class="btn btn-primary w-100" type="submit">Đăng kí</button>
                                     </div>
                                     <div class="col-12">
-                                        <p class="small mb-0">Already have an account? <a href="<%=request.getContextPath()%>/login">Log in</a></p>
+                                        <p class="small mb-0">Already have an account? <a href="<%=request.getContextPath()%>/login">Đăng nập</a></p>
+                                    </div>
+                                    <div class="col-12">
+                                        <a href="<%=request.getContextPath()%>/hotel-register">Đăng kí với tư cách khách sạn.</a>
                                     </div>
                                 </form>
 

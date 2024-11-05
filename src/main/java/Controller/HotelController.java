@@ -92,4 +92,33 @@ public class HotelController {
             }
         }
     }
+
+    @WebServlet("/admin/block-hotel")
+    public static class BlockHotel extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String hotel_id = req.getParameter("hotel_id");
+            if (HotelDao.changeBlockHotel(hotel_id)){
+                req.getSession().setAttribute("mess", "success|Cập nhật thành công");
+                resp.sendRedirect(req.getContextPath() + "/admin/hotel-control");
+            } else {
+                req.getSession().setAttribute("mess", "error|Cập nhật không thành công");
+                resp.sendRedirect(req.getContextPath() + "/admin/hotel-control");
+            }
+        }
+    }
+    @WebServlet("/admin/verrify-hotel")
+    public static class VerifyHotel extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String hotel_id = req.getParameter("hotel_id");
+            if (HotelDao.changeVerifyHotel(hotel_id)){
+                req.getSession().setAttribute("mess", "success|Cập nhật thành công");
+                resp.sendRedirect(req.getContextPath() + "/admin/hotel-control");
+            } else {
+                req.getSession().setAttribute("mess", "error|Cập nhật không thành công");
+                resp.sendRedirect(req.getContextPath() + "/admin/hotel-control");
+            }
+        }
+    }
 }

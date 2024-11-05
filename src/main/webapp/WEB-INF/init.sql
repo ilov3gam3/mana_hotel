@@ -20,6 +20,7 @@ create table customers
     avatar      nvarchar(max),
     password    nvarchar(max),
     is_verified bit,
+    is_blocked bit default 0,
     token       nvarchar(max),
     created_at  datetime default current_timestamp,
 );
@@ -41,6 +42,8 @@ create table hotels
     gg_map_link nvarchar(max),
     avatar      nvarchar(max),
     password    nvarchar(max),
+    is_verified bit default 0,
+    is_blocked bit default 0,
     created_at  datetime default current_timestamp,
 );
 create table room_types

@@ -84,7 +84,8 @@ public class CustomerDao {
                         resultSet.getInt("id"),
                         resultSet.getString("email"),
                         resultSet.getString("password"),
-                        resultSet.getBoolean("is_verified")
+                        resultSet.getBoolean("is_verified"),
+                        resultSet.getBoolean("is_blocked")
                 );
             }
             return null;
@@ -166,7 +167,8 @@ public class CustomerDao {
                     resultSet.getString("password"),
                     resultSet.getBoolean("is_verified"),
                     resultSet.getString("token"),
-                    resultSet.getTimestamp("created_at")
+                    resultSet.getTimestamp("created_at"),
+                    resultSet.getBoolean("is_blocked")
                 ));
             }
             return customers;
@@ -175,5 +177,7 @@ public class CustomerDao {
             return null;
         }
     }
-
+    public static boolean blockCustomer(String customer_id){
+        return DBContext.executeUpdate("update customers set is_blocked = ~is_blocked where id = ?", new String[]{customer_id});
+    }
 }
