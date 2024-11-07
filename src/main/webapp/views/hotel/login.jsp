@@ -42,7 +42,7 @@
                                         <input type="password" name="password" class="form-control" id="yourPassword" required>
                                         <div class="invalid-feedback">Please enter your password!</div>
                                     </div>
-
+                                    <a href="<%=request.getContextPath()%>/hotel-register">Đăng kí khách sạn mới</a>
                                     <div class="col-12">
                                         <button class="btn btn-primary w-100" type="submit">Login</button>
                                     </div>
