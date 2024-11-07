@@ -61,7 +61,7 @@
           <% } else {%>
             <tr>
               <td><%=payments.get(i).id%></td>
-              <td><%=payments.get(i).amount%></td>
+              <td><%=String.format("%,d", payments.get(i).amount)%></td>
               <td><%=payments.get(i).txnRef%></td>
               <td><%=payments.get(i).orderInfo%></td>
               <td><%=payments.get(i).bankCode%></td>

@@ -83,9 +83,9 @@
                     <% ArrayList<Room> rooms; %>
                     <% rooms = request.getAttribute("rooms") != null ? (ArrayList<Room>) request.getAttribute("rooms") : new ArrayList<>();%>
                     <% for (int i = 0; i < rooms.size(); i++) { %>
-                    <button onclick="chooseRoom(<%=rooms.get(i).id%>)" id="<%=rooms.get(i).id%>"
-                            class="btn btn-outline-info col-1 m-1 available-room"><%=rooms.get(i).number%>
-                    </button>
+                        <button onclick="chooseRoom(<%=rooms.get(i).id%>)" id="<%=rooms.get(i).id%>"
+                                class="btn btn-outline-info col-1 m-1 available-room"><%=rooms.get(i).number%>
+                        </button>
                     <% } %>
                 </div>
                 <form action="<%=request.getContextPath()%>/customer/book-room" method="post">
@@ -152,6 +152,7 @@
     const width = $("#small_images").width();
     const each_img_width = Math.floor(width / 4);
     const images = JSON.parse('<%=roomType.getImagesJson()%>')
+    let room_id_arr = []
     changePreview(0)
 
     function changePreview(i) {
@@ -172,10 +173,23 @@
     }
 
     function chooseRoom(id) {
+        let room_id_input = $("#room_id")
         $(".available-room").attr("class", "btn btn-outline-info col-1 m-1 available-room");
-        $("#" + id).attr("class", "btn btn-info col-1 m-1 available-room");
-        $("#room_id").val(id)
-        $("#submit_book_form").prop('disabled', false);
+        if (room_id_arr.includes(id)){
+            let index = room_id_arr.indexOf(id);
+            room_id_arr.splice(index, 1);
+        } else {
+            room_id_arr.push(id)
+        }
+        room_id_input.val(room_id_arr.join(','))
+        for (let i = 0; i < room_id_arr.length; i++) {
+            $("#" + room_id_arr[i]).attr("class", "btn btn-info col-1 m-1 available-room");
+        }
+        if (room_id_arr.length === 0){
+            $("#submit_book_form").prop('disabled', true);
+        } else {
+            $("#submit_book_form").prop('disabled', false);
+        }
     }
 </script>
 </html>

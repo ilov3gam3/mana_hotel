@@ -19,12 +19,12 @@ public class BookingController {
     public static class CustomerBookRoom extends HttpServlet{
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            String room_id = req.getParameter("room_id");
+            String[] room_ids = req.getParameter("room_id").split(",");
             String from_date = req.getParameter("from_date");
             String to_date = req.getParameter("to_date");
             String room_type_id = req.getParameter("room_type_id");
             String customer_id = req.getSession().getAttribute("customer").toString();
-            if (RoomDao.bookARoom(room_id, from_date, to_date, room_type_id, customer_id)){
+            if (RoomDao.bookARoom(room_ids, from_date, to_date, room_type_id, customer_id)){
                 req.getSession().setAttribute("mess", "success|Đặt phòng thành công.");
             } else {
                 req.getSession().setAttribute("mess", "error|Đặt phòng không thành công.");

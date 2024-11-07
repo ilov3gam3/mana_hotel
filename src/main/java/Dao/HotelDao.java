@@ -23,7 +23,9 @@ public class HotelDao {
                             resultSet.getString("email"),
                             resultSet.getString("avatar"),
                             resultSet.getString("password"),
-                            resultSet.getTimestamp("created_at")
+                            resultSet.getTimestamp("created_at"),
+                            resultSet.getBoolean("is_verified"),
+                            resultSet.getBoolean("is_blocked")
                     );
                 }
             }

@@ -69,7 +69,7 @@
         <form id="getVnPayUrlForm">
             <input type="hidden" name="bankCode" value="">
             <input type="hidden" name="language" value="vn">
-            <button onclick="getVnpayUrl()" type="button" class="btn btn-success">Thanh toán</button>
+            <button onclick="getVnpayUrl()" type="button" class="btn btn-success">Tới trang thanh toán</button>
         </form>
         <div class="col-12">
             <table class="table datatable">
@@ -79,6 +79,7 @@
                     <th>ID</th>
                     <th>Loại phòng</th>
                     <th>Khách sạn</th>
+                    <th>Số phòng</th>
                     <th>Ngày check in</th>
                     <th>Ngày check out</th>
                     <th>Trạng thái</th>
@@ -95,10 +96,11 @@
                             <td><%=bookings.get(i).id%></td>
                             <td><%=bookings.get(i).room_type_name%></td>
                             <td><%=bookings.get(i).hotel_name%></td>
+                            <td><%=bookings.get(i).room_number%></td>
                             <td><%=bookings.get(i).check_in_date.toString().replace("00:00:00.0", "")%></td>
                             <td><%=bookings.get(i).check_out_date.toString().replace("00:00:00.0", "")%></td>
                             <td><%=bookings.get(i).status%></td>
-                            <td><%=bookings.get(i).payment_id == 0 ? bookings.get(i).temp_price * PaymentController.GetVNPayUrlServlet.countDays(bookings.get(i).check_in_date, bookings.get(i).check_out_date) : bookings.get(i).price%></td>
+                            <td><%=bookings.get(i).payment_id == 0 ? String.format("%,d", bookings.get(i).temp_price * PaymentController.GetVNPayUrlServlet.countDays(bookings.get(i).check_in_date, bookings.get(i).check_out_date)) : String.format("%,d", bookings.get(i).price)%></td>
                             <td><%=bookings.get(i).created_at%></td>
                             <td class="col-2">
                                 <% if (bookings.get(i).payment_id == 0 && bookings.get(i).status == BookingStatus.NOT_PAID) { %>
@@ -120,7 +122,7 @@
                                 <% } else if (bookings.get(i).payment_id != 0 && bookings.get(i).status == BookingStatus.PAID){ %>
                                     <div class="col-12 row m-1">
                                         <form>
-                                            <a href="<%=request.getContextPath()%>/customer/transaction?id=<%=bookings.get(i).id%>">
+                                            <a href="<%=request.getContextPath()%>/customer/transaction?id=<%=bookings.get(i).payment_id%>">
                                                 <button type="button" style="width: 100%" class="btn btn-info">
                                                     Xem chi tiết giao dịch
                                                 </button>
@@ -253,7 +255,10 @@
 </body>
 <script>
     function getVnpayUrl() {
-        let postData = $("#getVnPayUrlForm").serialize();
+        if (getCheckboxData() === ''){
+            toastr.warning("Bạn chưa chọn phòng nào để thanh toaán.")
+        } else {
+            let postData = $("#getVnPayUrlForm").serialize();
         postData += '&booking_ids=' + encodeURIComponent(getCheckboxData())
         $.ajax({
             type: "POST",
@@ -275,6 +280,7 @@
             }
         });
         return false;
+        }
     }
     function addBookingIdReviewForm(id) {
         $("#booking_id").val(id)

@@ -22,7 +22,7 @@
         </nav>
     </div><!-- End Page Title -->
     <section class="section dashboard">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+        <button hidden="hidden" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#verticalycentered">
             Thêm mới khách sạn
         </button>
         <div class="modal fade" id="verticalycentered" tabindex="-1">

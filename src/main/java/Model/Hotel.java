@@ -46,4 +46,15 @@ public class Hotel {
         this.is_verified = is_verified;
         this.is_blocked = is_blocked;
     }
+
+    public Hotel(int id, String name, String email, String avatar, String password, Date created_at, boolean is_verified, boolean is_blocked) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.avatar = avatar;
+        this.password = password;
+        this.created_at = created_at;
+        this.is_verified = is_verified;
+        this.is_blocked = is_blocked;
+    }
 }

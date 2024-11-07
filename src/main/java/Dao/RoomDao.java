@@ -6,6 +6,7 @@ import Model.Room;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class RoomDao {
     public static ArrayList<String> generateRange(String x, String y) {
@@ -22,9 +23,13 @@ public class RoomDao {
         if (to == null) {
             DBContext.executeUpdate("insert into rooms(hotel_id, number, room_type_id, is_available) VALUES (?, ?, ?, ?);", new String[]{hotel_id, from, room_type_id, "true"});
         } else {
-            ArrayList<String> range = generateRange(from, to);
-            for (int i = 0; i < range.size(); i++) {
-                DBContext.executeUpdate("insert into rooms(hotel_id, number, room_type_id, is_available) VALUES (?, ?, ?, ?);", new String[]{hotel_id, range.get(i), room_type_id, "true"});
+            if (to.isEmpty()){
+                DBContext.executeUpdate("insert into rooms(hotel_id, number, room_type_id, is_available) VALUES (?, ?, ?, ?);", new String[]{hotel_id, from, room_type_id, "true"});
+            } else {
+                ArrayList<String> range = generateRange(from, to);
+                for (int i = 0; i < range.size(); i++) {
+                    DBContext.executeUpdate("insert into rooms(hotel_id, number, room_type_id, is_available) VALUES (?, ?, ?, ?);", new String[]{hotel_id, range.get(i), room_type_id, "true"});
+                }
             }
         }
         return true;
@@ -92,18 +97,39 @@ public class RoomDao {
             return new ArrayList<>();
         }
     }
-    public static boolean bookARoom(String room_id, String from_date, String to_date, String room_type_id, String customer_id){
+    public static boolean isAllTrue(boolean[] boolArray) {
+        for (boolean value : boolArray) {
+            if (!value) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public static boolean bookARoom(String[] room_ids, String from_date, String to_date, String room_type_id, String customer_id){
         try {
-            ArrayList<Room> rooms = getAvailableRoom(from_date, to_date, room_type_id);
-            boolean result = false;
-            for (int i = 0; i < rooms.size(); i++) {
-                if (rooms.get(i).id == Integer.parseInt(room_id)) {
-                    result = true;
+            ArrayList<Room> availableRooms = getAvailableRoom(from_date, to_date, room_type_id);
+            boolean[] check_arr = new boolean[room_ids.length];
+            for (int i = 0; i < room_ids.length; i++) {
+                for (int j = 0; j < availableRooms.size(); j++) {
+                    if (Integer.parseInt(room_ids[i]) == availableRooms.get(j).id){
+                        check_arr[i] = true;
+                        break;
+                    }
                 }
             }
-            if (result){
-                String sql = "insert into bookings(customer_id, room_id, payment_id, check_in_date, check_out_date, price, status) VALUES (?, ?, null, ?, ?,null, ?);";
-                return DBContext.executeUpdate(sql, new String[]{customer_id, room_id, from_date, to_date, BookingStatus.NOT_PAID.text});
+
+            if (isAllTrue(check_arr)){
+                StringBuilder sql = new StringBuilder();
+                String[] params = new String[room_ids.length * 5];
+                for (int i = 0; i < room_ids.length; i++) {
+                    sql.append("insert into bookings(customer_id, room_id, payment_id, check_in_date, check_out_date, price, status) VALUES (?, ?, null, ?, ?,null, ?);");
+                    params[i*5] = customer_id;
+                    params[i*5+1] = room_ids[i];
+                    params[i*5+2] = from_date;
+                    params[i*5+3] = to_date;
+                    params[i*5+4] = BookingStatus.NOT_PAID.text;
+                }
+                return DBContext.executeUpdate(sql.toString(), params);
             }
             return false;
         }catch (Exception e){

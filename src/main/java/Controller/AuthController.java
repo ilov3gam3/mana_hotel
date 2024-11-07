@@ -299,11 +299,21 @@ public class AuthController {
             String password = req.getParameter("password");
             Hotel hotel = HotelDao.hotelLogin(email, password);
             if (hotel != null){
-                req.getSession().setAttribute("mess", "success|Đăng nhập thành công.");
-                req.getSession().setAttribute("hotel", hotel.id);
-                req.getSession().removeAttribute("admin");
-                req.getSession().removeAttribute("customer");
-                resp.sendRedirect(req.getContextPath() + "/");
+                if (hotel.is_verified){
+                    if (!hotel.is_blocked){
+                        req.getSession().setAttribute("mess", "success|Đăng nhập thành công.");
+                        req.getSession().setAttribute("hotel", hotel.id);
+                        req.getSession().removeAttribute("admin");
+                        req.getSession().removeAttribute("customer");
+                        resp.sendRedirect(req.getContextPath() + "/");
+                    } else {
+                        req.getSession().setAttribute("mess", "error|Tài khoản này đã bị block, vui lòng liên hệ admin.");
+                        resp.sendRedirect(req.getContextPath() + "/hotel/login");
+                    }
+                } else {
+                    req.getSession().setAttribute("mess", "error|Tài khoản này chưa được xác thực, vui lòng liên hệ admin.");
+                    resp.sendRedirect(req.getContextPath() + "/hotel/login");
+                }
             } else {
                 req.getSession().setAttribute("mess", "error|Đăng nhập không thành công.");
                 resp.sendRedirect(req.getContextPath() + "/hotel/login");

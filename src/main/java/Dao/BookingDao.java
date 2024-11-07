@@ -18,6 +18,7 @@ public class BookingDao {
                     "       room_types.id      as room_type_id,\n" +
                     "       hotels.id          as hotel_id,\n" +
                     "       reviews.id         as review_id,\n" +
+                    "       rooms.number         as room_number,\n" +
                     "       booking_id,\n" +
                     "       rating,\n" +
                     "       comment,\n" +
@@ -37,6 +38,7 @@ public class BookingDao {
                         resultSet.getInt("id"),
                         resultSet.getInt("customer_id"),
                         resultSet.getInt("room_id"),
+                        resultSet.getString("room_number"),
                         resultSet.getInt("payment_id"),
                         resultSet.getTimestamp("check_in_date"),
                         resultSet.getTimestamp("check_out_date"),

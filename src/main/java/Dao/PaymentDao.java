@@ -1,5 +1,7 @@
 package Dao;
 
+import Controller.PaymentController;
+import Model.Booking;
 import Model.BookingStatus;
 import Model.Payment;
 import Model.TransactionStatus;
@@ -11,6 +13,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class PaymentDao {
+    public static int getPriceByBooking_id(ArrayList<Booking> bookings, String booking_id) {
+        for (int i = 0; i < bookings.size(); i++) {
+            if (bookings.get(i).id == Integer.parseInt(booking_id)) {
+                return bookings.get(i).temp_price * PaymentController.GetVNPayUrlServlet.countDays(bookings.get(i).check_in_date, bookings.get(i).check_out_date);
+            }
+        }
+        return 0;
+    }
     public static boolean handleVNPayResult(String amount, String paid_at, String vnp_TransactionStatus, String vnp_TransactionNo, String vnp_BankTranNo, String vnp_CardType, String vnp_BankCode, String vnp_OrderInfo, String vnp_TxnRef, String customer_id){
         try {
             if (!checkPaymentExist(amount, vnp_TxnRef, vnp_OrderInfo)){
@@ -20,18 +30,18 @@ public class PaymentDao {
                 LocalDateTime now = LocalDateTime.now();
                 DateTimeFormatter sqlDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(sqlDateTimeFormatter);
-                sql = "update bookings set payment_id = ?, price = ?, updated_at = ?, status = ? where id in ";
-                StringBuilder sql_ids = new StringBuilder("(");
+                sql = "";
+                String[] sql_params = new String[booking_ids.length * 5];
+                ArrayList<Booking> bookings = BookingDao.getBookingWithId(booking_ids);
                 for (int i = 0; i < booking_ids.length; i++) {
-                    if (i == booking_ids.length - 1){
-                        sql_ids.append(booking_ids[i]);
-                    } else {
-                        sql_ids.append(booking_ids[i]).append(",");
-                    }
+                    sql += "update bookings set payment_id = ?, price = ?, updated_at = ?, status = ? where id = ?;";
+                    sql_params[i * 5] = String.valueOf(payment_id);
+                    sql_params[i * 5 + 1] = String.valueOf(getPriceByBooking_id(bookings, booking_ids[i]));
+                    sql_params[i * 5 + 2] = formattedDateTime;
+                    sql_params[i * 5 + 3] = BookingStatus.PAID.text;
+                    sql_params[i * 5 + 4] = booking_ids[i];
                 }
-                sql_ids.append(")");
-                sql += sql_ids;
-                return DBContext.executeUpdate(sql, new String[]{String.valueOf(payment_id), amount, formattedDateTime, BookingStatus.PAID.text});
+                return DBContext.executeUpdate(sql, sql_params);
             } else {
                 return false;
             }
