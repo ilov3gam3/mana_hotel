@@ -66,10 +66,16 @@
         </nav>
     </div><!-- End Page Title -->
     <section class="section dashboard">
+        <form id="getVnPayUrlForm">
+            <input type="hidden" name="bankCode" value="">
+            <input type="hidden" name="language" value="vn">
+            <button onclick="getVnpayUrl()" type="button" class="btn btn-success">Thanh toán</button>
+        </form>
         <div class="col-12">
             <table class="table datatable">
                 <thead>
                 <tr>
+                    <th></th>
                     <th>ID</th>
                     <th>Loại phòng</th>
                     <th>Khách sạn</th>
@@ -85,6 +91,7 @@
                     <% ArrayList<Booking> bookings = (ArrayList<Booking>) request.getAttribute("bookings");%>
                     <% for (int i = 0; i < bookings.size(); i++) { %>
                         <tr>
+                            <td><input class="form-check-input" name="myCheckbox" type="checkbox" value="<%=bookings.get(i).id%>" <%=bookings.get(i).payment_id != 0 && bookings.get(i).status != BookingStatus.NOT_PAID ? "disabled" : ""%>></td>
                             <td><%=bookings.get(i).id%></td>
                             <td><%=bookings.get(i).room_type_name%></td>
                             <td><%=bookings.get(i).hotel_name%></td>
@@ -96,11 +103,8 @@
                             <td class="col-2">
                                 <% if (bookings.get(i).payment_id == 0 && bookings.get(i).status == BookingStatus.NOT_PAID) { %>
                                     <div class="col-12 row m-1">
-                                        <form style="width: 100%" id="<%=bookings.get(i).id%>" action="<%=request.getContextPath()%>/customer/get-vnpay-url">
-                                            <input type="hidden" name="booking_id" value="<%=bookings.get(i).id%>">
-                                            <input type="hidden" name="bankCode" value="">
-                                            <input type="hidden" name="language" value="vn">
-                                            <button style="width: 100%" onclick="getVnpayUrl(<%=bookings.get(i).id%>)" class="btn btn-success" type="button">
+                                        <form>
+                                            <button style="width: 100%" onclick="checkCheckbox(<%=bookings.get(i).id%>)" class="btn btn-success" type="button">
                                                 Thanh toán
                                             </button>
                                         </form>
@@ -248,16 +252,16 @@
 
 </body>
 <script>
-    function getVnpayUrl(id) {
-        console.log(123)
-        var postData = $("#" + id).serialize();
-        var submitUrl = $("#" + id).attr("action");
+    function getVnpayUrl() {
+        let postData = $("#getVnPayUrlForm").serialize();
+        postData += '&booking_ids=' + encodeURIComponent(getCheckboxData())
         $.ajax({
             type: "POST",
-            url: submitUrl,
+            url: '<%=request.getContextPath()%>/customer/get-vnpay-url',
             data: postData,
             dataType: 'JSON',
             success: function (x) {
+                console.log(x)
                 if (x.code === '00') {
                     if (window.vnpay) {
                         vnpay.open({width: 768, height: 600, url: x.data});
@@ -280,6 +284,19 @@
         $(`input[name="rate"][value="`+rate+`"]`).prop("checked", true)
         $("#update_comment").val(comment)
         $("#update_review_id").val(review_id)
+    }
+    function getCheckboxData() {
+        const checkboxes = document.querySelectorAll('input[name="myCheckbox"]:checked');
+        const selectedValues = Array.from(checkboxes).map(checkbox => checkbox.value);
+        return selectedValues.join(',');
+    }
+    function checkCheckbox(value) {
+        const checkbox = document.querySelector(`input[name="myCheckbox"][value="`+value+`"]`);
+        if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+        } else {
+            console.log("Checkbox with value " + value + " not found.");
+        }
     }
 </script>
 </html>

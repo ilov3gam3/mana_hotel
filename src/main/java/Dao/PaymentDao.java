@@ -16,11 +16,22 @@ public class PaymentDao {
             if (!checkPaymentExist(amount, vnp_TxnRef, vnp_OrderInfo)){
                 String sql = "insert into payments(customer_id, amount, txnRef, orderInfo, bankCode, transactionNo, transactionStatus, cardType, bankTranNo, paid_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 int payment_id = DBContext.insertGetLastId(sql, new String[]{customer_id, amount, vnp_TxnRef, vnp_OrderInfo, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_CardType, vnp_BankTranNo, paid_at});
-                String booking_id = vnp_OrderInfo.split("\\|")[1];
+                String[] booking_ids = vnp_OrderInfo.split("\\|")[1].split(",");
                 LocalDateTime now = LocalDateTime.now();
                 DateTimeFormatter sqlDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(sqlDateTimeFormatter);
-                return DBContext.executeUpdate("update bookings set payment_id = ?, price = ?, updated_at = ?, status = ? where id = ?", new String[]{String.valueOf(payment_id), amount, formattedDateTime, BookingStatus.PAID.text, booking_id});
+                sql = "update bookings set payment_id = ?, price = ?, updated_at = ?, status = ? where id in ";
+                StringBuilder sql_ids = new StringBuilder("(");
+                for (int i = 0; i < booking_ids.length; i++) {
+                    if (i == booking_ids.length - 1){
+                        sql_ids.append(booking_ids[i]);
+                    } else {
+                        sql_ids.append(booking_ids[i]).append(",");
+                    }
+                }
+                sql_ids.append(")");
+                sql += sql_ids;
+                return DBContext.executeUpdate(sql, new String[]{String.valueOf(payment_id), amount, formattedDateTime, BookingStatus.PAID.text});
             } else {
                 return false;
             }

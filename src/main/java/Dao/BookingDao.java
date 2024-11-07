@@ -65,14 +65,27 @@ public class BookingDao {
             return new ArrayList<>();
         }
     }
-    public static Booking getBookingWithId(String booking_id){
+    public static ArrayList<Booking> getBookingWithId(String[] booking_ids){
         try {
-            String sql = "select bookings.*, room_types.price as temp_price, room_types.name as room_type_name, hotels.name as hotel_name, room_types.id as room_type_id, hotels.id as hotel_id from bookings inner join rooms on bookings.room_id = rooms.id inner join room_types on rooms.room_type_id = room_types.id inner join hotels on room_types.hotel_id = hotels.id where bookings.id = ?;";
+            String sql = "select bookings.*, room_types.price as temp_price, room_types.name as room_type_name, hotels.name as hotel_name, room_types.id as room_type_id, hotels.id as hotel_id from bookings inner join rooms on bookings.room_id = rooms.id inner join room_types on rooms.room_type_id = room_types.id inner join hotels on room_types.hotel_id = hotels.id where bookings.id in ";
+            StringBuilder sql_ids = new StringBuilder("(");
+            for (int i = 0; i < booking_ids.length; i++) {
+                if (i == booking_ids.length - 1){
+                    sql_ids.append("?");
+                } else {
+                    sql_ids.append("?").append(",");
+                }
+            }
+            sql_ids.append(")");
+            sql += sql_ids;
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
-            preparedStatement.setString(1, booking_id);
+            for (int i = 0; i < booking_ids.length; i++) {
+                preparedStatement.setString(i+1, booking_ids[i]);
+            }
             ResultSet resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()){
-                return new Booking(
+            ArrayList<Booking> bookings = new ArrayList<>();
+            while (resultSet.next()){
+                bookings.add(new Booking(
                         resultSet.getInt("id"),
                         resultSet.getInt("customer_id"),
                         resultSet.getInt("room_id"),
@@ -88,12 +101,12 @@ public class BookingDao {
                         resultSet.getString("room_type_id"),
                         resultSet.getString("hotel_id"),
                         resultSet.getInt("temp_price")
-                );
+                ));
             }
-            return null;
+            return bookings;
         }catch (Exception e){
             e.printStackTrace();
-            return null;
+            return new ArrayList<>();
         }
     }
     public static boolean cancelBooking(String booking_id, String customer_id){
