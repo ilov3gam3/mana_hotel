@@ -1,8 +1,16 @@
 package Controller;
 
+import Dao.BookingDao;
 import Dao.HotelDao;
+import Dao.PaymentDao;
+import Dao.RoomTypeDao;
+import Model.Booking;
 import Model.Hotel;
+import Model.Payment;
+import Model.RoomType;
 import Util.UploadImage;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class HotelController {
     @WebServlet("/hotel/profile")
@@ -119,6 +128,30 @@ public class HotelController {
                 req.getSession().setAttribute("mess", "error|Cập nhật không thành công");
                 resp.sendRedirect(req.getContextPath() + "/admin/hotel-control");
             }
+        }
+    }
+    @WebServlet("/hotel/statistic")
+    public static class Statistic extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.getRequestDispatcher("/views/hotel/statistic.jsp").forward(req, resp);
+        }
+    }
+    @WebServlet("/hotel/api/hotel-get-statistics-data")
+    public static class HotelGetAllBookings extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String hotel_id = req.getSession().getAttribute("hotel").toString();
+            ArrayList<Payment> payments = PaymentDao.getAllPaymentsOfAHotel(hotel_id);
+            ArrayList<RoomType> roomTypes = RoomTypeDao.getAllRoomTypesOfAHotel(Integer.parseInt(hotel_id));
+            ArrayList<Booking> bookings = BookingDao.getAllBookingsOfHotel(hotel_id);
+            JsonObject jsonObject = new JsonObject();
+            Gson gson = new Gson();
+            jsonObject.addProperty("payments", gson.toJson(payments));
+            jsonObject.addProperty("roomTypes", gson.toJson(roomTypes));
+            jsonObject.addProperty("bookings", gson.toJson(bookings));
+            resp.setContentType("application/json");
+            resp.getWriter().write(gson.toJson(jsonObject));
         }
     }
 }

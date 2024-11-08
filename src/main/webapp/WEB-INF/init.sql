@@ -112,6 +112,8 @@ create table bookings
     check_out_date date,
     price          int,
     status         VARCHAR(20),
+    is_checked_in bit default 0,
+    is_checked_out bit default 0,
     created_at     datetime default current_timestamp,
     updated_at     datetime,
 );
@@ -364,3 +366,4 @@ INSERT INTO reviews (id, customer_id, booking_id, rating, comment, created_at) V
 INSERT INTO reviews (id, customer_id, booking_id, rating, comment, created_at) VALUES (9, 4, 10, 4, N'ổn áp, tuy nhiên k đc như kì vọng nên cho 4*', N'2024-10-31 22:40:34.807');
 INSERT INTO reviews (id, customer_id, booking_id, rating, comment, created_at) VALUES (10, 4, 11, 2, N'tệ quá :(', N'2024-10-31 22:41:28.367');
 SET IDENTITY_INSERT reviews OFF;
+

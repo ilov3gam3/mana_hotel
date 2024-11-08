@@ -94,6 +94,12 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link collapsed" href="<%=request.getContextPath() + "/hotel/booking-control"%>">
+                <i class="bi bi-door-open"></i>
+                <span>Quản lý đơn đặt phòng</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link collapsed" href="<%=request.getContextPath() + "/hotel/statistic"%>">
                 <i class="ri-bar-chart-2-fill"></i>
                 <span>Thống kê</span>

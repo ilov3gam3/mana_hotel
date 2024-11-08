@@ -28,7 +28,7 @@ public class BookingDao {
                     "         inner join room_types on rooms.room_type_id = room_types.id\n" +
                     "         inner join hotels on room_types.hotel_id = hotels.id\n" +
                     "         left join reviews on bookings.id = reviews.booking_id\n" +
-                    "where bookings.customer_id = ?;";
+                    "where bookings.customer_id = ? order by id desc;";
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
             preparedStatement.setString(1, customer_id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -99,8 +99,8 @@ public class BookingDao {
                         resultSet.getTimestamp("created_at"),
                         resultSet.getTimestamp("updated_at"),
                         resultSet.getString("room_type_name"),
-                        resultSet.getString("hotel_name"),
                         resultSet.getString("room_type_id"),
+                        resultSet.getString("hotel_name"),
                         resultSet.getString("hotel_id"),
                         resultSet.getInt("temp_price")
                 ));
@@ -123,6 +123,7 @@ public class BookingDao {
                     "       room_types.id      as room_type_id,\n" +
                     "       hotels.id          as hotel_id,\n" +
                     "       reviews.id         as review_id,\n" +
+                    "       rooms.number       as room_number,\n" +
                     "       booking_id,\n" +
                     "       rating,\n" +
                     "       comment,\n" +
@@ -132,7 +133,7 @@ public class BookingDao {
                     "         inner join room_types on rooms.room_type_id = room_types.id\n" +
                     "         inner join hotels on room_types.hotel_id = hotels.id\n" +
                     "         left join reviews on bookings.id = reviews.booking_id\n" +
-                    "where rooms.hotel_id = ?;";
+                    "where rooms.hotel_id = ? order by id desc;";
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
             preparedStatement.setString(1, hotel_id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -161,13 +162,24 @@ public class BookingDao {
                                 resultSet.getInt("rating"),
                                 resultSet.getString("comment"),
                                 resultSet.getTimestamp("review_created_at")
-                        )
+                        ),
+                        resultSet.getBoolean("is_checked_in"),
+                        resultSet.getBoolean("is_checked_out"),
+                        resultSet.getString("room_number")
                 ));
             }
             return bookings;
         }catch (Exception e){
             e.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    public static boolean hotelUpdateBooking(String type, String booking_id){
+        if (type.equals("checkin")){
+            return DBContext.executeUpdate("update bookings set is_checked_in = ~is_checked_in where id = ?;", new String[]{booking_id});
+        } else {
+            return DBContext.executeUpdate("update bookings set is_checked_out = ~is_checked_out where id = ?;", new String[]{booking_id});
         }
     }
 }

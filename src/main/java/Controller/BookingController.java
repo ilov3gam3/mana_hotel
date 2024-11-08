@@ -57,4 +57,30 @@ public class BookingController {
             resp.sendRedirect(req.getContextPath() + "/customer/booking");
         }
     }
+    @WebServlet("/hotel/booking-control")
+    public static class HotelControlBooking extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.getRequestDispatcher("/views/hotel/booking-control.jsp").forward(req, resp);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            super.doPost(req, resp);
+        }
+    }
+    @WebServlet("/hotel/change-booking-checkin-checkout")
+    public static class HotelChangeBookingCheckInOut extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String type = req.getParameter("type");
+            String booking_id = req.getParameter("booking_id");
+            if (BookingDao.hotelUpdateBooking(type, booking_id)){
+                req.getSession().setAttribute("mess", "success|Cập nhật thành công");
+            } else {
+                req.getSession().setAttribute("mess", "error|Cập nhật không thành công.");
+            }
+            resp.sendRedirect(req.getContextPath() + "/hotel/booking-control");
+        }
+    }
 }

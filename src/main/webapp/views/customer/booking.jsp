@@ -275,7 +275,7 @@
                     }
                     return false;
                 } else {
-                    alert(x.Message);
+                    alert(x.message);
                 }
             }
         });

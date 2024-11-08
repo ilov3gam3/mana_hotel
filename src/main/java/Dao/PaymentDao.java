@@ -1,10 +1,7 @@
 package Dao;
 
 import Controller.PaymentController;
-import Model.Booking;
-import Model.BookingStatus;
-import Model.Payment;
-import Model.TransactionStatus;
+import Model.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,27 +18,42 @@ public class PaymentDao {
         }
         return 0;
     }
+    public static  boolean checkIfBookingsDuplicated(ArrayList<Booking> bookings){
+        for (int i = 0; i < bookings.size(); i++) {
+            ArrayList<Room> available_rooms = RoomDao.getAvailableRoom(bookings.get(i).check_in_date.toString(), bookings.get(i).check_out_date.toString(), bookings.get(i).room_type_id);
+            for (int j = 0; j < available_rooms.size(); j++) {
+                if (available_rooms.get(j).id == bookings.get(i).room_id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public static boolean handleVNPayResult(String amount, String paid_at, String vnp_TransactionStatus, String vnp_TransactionNo, String vnp_BankTranNo, String vnp_CardType, String vnp_BankCode, String vnp_OrderInfo, String vnp_TxnRef, String customer_id){
         try {
             if (!checkPaymentExist(amount, vnp_TxnRef, vnp_OrderInfo)){
-                String sql = "insert into payments(customer_id, amount, txnRef, orderInfo, bankCode, transactionNo, transactionStatus, cardType, bankTranNo, paid_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-                int payment_id = DBContext.insertGetLastId(sql, new String[]{customer_id, amount, vnp_TxnRef, vnp_OrderInfo, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_CardType, vnp_BankTranNo, paid_at});
                 String[] booking_ids = vnp_OrderInfo.split("\\|")[1].split(",");
-                LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter sqlDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String formattedDateTime = now.format(sqlDateTimeFormatter);
-                sql = "";
-                String[] sql_params = new String[booking_ids.length * 5];
                 ArrayList<Booking> bookings = BookingDao.getBookingWithId(booking_ids);
-                for (int i = 0; i < booking_ids.length; i++) {
-                    sql += "update bookings set payment_id = ?, price = ?, updated_at = ?, status = ? where id = ?;";
-                    sql_params[i * 5] = String.valueOf(payment_id);
-                    sql_params[i * 5 + 1] = String.valueOf(getPriceByBooking_id(bookings, booking_ids[i]));
-                    sql_params[i * 5 + 2] = formattedDateTime;
-                    sql_params[i * 5 + 3] = BookingStatus.PAID.text;
-                    sql_params[i * 5 + 4] = booking_ids[i];
+                if (checkIfBookingsDuplicated(bookings)){
+                    String sql = "insert into payments(customer_id, amount, txnRef, orderInfo, bankCode, transactionNo, transactionStatus, cardType, bankTranNo, paid_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                    int payment_id = DBContext.insertGetLastId(sql, new String[]{customer_id, amount, vnp_TxnRef, vnp_OrderInfo, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_CardType, vnp_BankTranNo, paid_at});
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter sqlDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String formattedDateTime = now.format(sqlDateTimeFormatter);
+                    sql = "";
+                    String[] sql_params = new String[booking_ids.length * 5];
+                    for (int i = 0; i < booking_ids.length; i++) {
+                        sql += "update bookings set payment_id = ?, price = ?, updated_at = ?, status = ? where id = ?;";
+                        sql_params[i * 5] = String.valueOf(payment_id);
+                        sql_params[i * 5 + 1] = String.valueOf(getPriceByBooking_id(bookings, booking_ids[i]));
+                        sql_params[i * 5 + 2] = formattedDateTime;
+                        sql_params[i * 5 + 3] = BookingStatus.PAID.text;
+                        sql_params[i * 5 + 4] = booking_ids[i];
+                    }
+                    return DBContext.executeUpdate(sql, sql_params);
+                } else {
+                    return false;
                 }
-                return DBContext.executeUpdate(sql, sql_params);
             } else {
                 return false;
             }
@@ -67,7 +79,7 @@ public class PaymentDao {
     }
     public static ArrayList<Payment> getPaymentsOfCustomer(String customer_id){
         try {
-            String sql = "select * from payments where customer_id = ?;";
+            String sql = "select * from payments where customer_id = ? order by id desc;";
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
             preparedStatement.setString(1, customer_id);
             ResultSet resultSet = preparedStatement.executeQuery();

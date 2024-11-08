@@ -139,9 +139,13 @@
                     .then((res) => {
                         this.payments = JSON.parse(res.data.payments)
                         this.roomTypes = JSON.parse(res.data.roomTypes)
+                        this.bookings = JSON.parse(res.data.bookings)
                         for (let i = 0; i < this.roomTypes.length; i++) {
                             this.roomTypes[i].selected = false
                         }
+                        console.log(this.payments)
+                        console.log(this.roomTypes)
+                        console.log(this.bookings)
                         this.init_line_chart_revenue()
                     })
             },

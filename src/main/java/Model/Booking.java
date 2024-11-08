@@ -20,6 +20,8 @@ public class Booking {
     public String hotel_id;
     public int temp_price;
     public Review review;
+    public boolean is_checked_in;
+    public boolean is_checked_out;
 
     public Booking(int id, int customer_id, int room_id, int payment_id, Date check_in_date, Date check_out_date, int price, BookingStatus status, Date created_at, Date updated_at) {
         this.id = id;
@@ -52,7 +54,7 @@ public class Booking {
         this.temp_price = temp_price;
     }
 
-    public Booking(int id, int customer_id, int room_id, int payment_id, Date check_in_date, Date check_out_date, int price, BookingStatus status, Date created_at, Date updated_at, String room_type_name, String room_type_id, String hotel_name, String hotel_id, int temp_price, Review review) {
+    public Booking(int id, int customer_id, int room_id, int payment_id, Date check_in_date, Date check_out_date, int price, BookingStatus status, Date created_at, Date updated_at, String room_type_name, String room_type_id, String hotel_name, String hotel_id, int temp_price, Review review, boolean is_checked_in, boolean is_checked_out, String room_number) {
         this.id = id;
         this.customer_id = customer_id;
         this.room_id = room_id;
@@ -69,6 +71,9 @@ public class Booking {
         this.hotel_id = hotel_id;
         this.temp_price = temp_price;
         this.review = review;
+        this.is_checked_in = is_checked_in;
+        this.is_checked_out = is_checked_out;
+        this.room_number = room_number;
     }
     public Booking(int id, int customer_id, int room_id, String room_number, int payment_id, Date check_in_date, Date check_out_date, int price, BookingStatus status, Date created_at, Date updated_at, String room_type_name, String room_type_id, String hotel_name, String hotel_id, int temp_price, Review review) {
         this.id = id;

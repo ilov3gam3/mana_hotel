@@ -1,7 +1,9 @@
 package Controller;
 
 import Dao.CustomerDao;
+import Dao.PaymentDao;
 import Model.Customer;
+import Model.Payment;
 import Util.UploadImage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -18,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 public class CustomerController {
     @WebServlet("/customer/profile")
@@ -138,6 +141,17 @@ public class CustomerController {
                 req.getSession().setAttribute("mess", "error|Cập nhật không thành công");
                 resp.sendRedirect(req.getContextPath() + "/admin/customer-control");
             }
+        }
+    }
+
+    @WebServlet("/customer/transaction")
+    public static class CustomerViewTransaction extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String customer_id = req.getSession().getAttribute("customer").toString();
+            ArrayList<Payment> payments = PaymentDao.getPaymentsOfCustomer(customer_id);
+            req.setAttribute("payments", payments);
+            req.getRequestDispatcher("/views/customer/transaction.jsp").forward(req, resp);
         }
     }
 }
