@@ -36,3 +36,14 @@
         $(".reload_chosen").chosen('destroy').chosen();
     });
 </script>
+<% if (request.getSession().getAttribute("hotel") != null) { %>
+<script>
+    const websocket = new WebSocket((window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + "<%=request.getContextPath()%>/my-websocket");
+    websocket.onopen = function () {
+        websocket.send("subscribe:<%=request.getSession().getAttribute("hotel")%>");
+    }
+    websocket.onmessage = (event) => {
+        toastr.success(event.data);
+    }
+</script>
+<% } %>

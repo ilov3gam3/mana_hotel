@@ -22,6 +22,9 @@ public class Booking {
     public Review review;
     public boolean is_checked_in;
     public boolean is_checked_out;
+    public TransactionStatus transactionStatus;
+    public int amount;
+    public Date paid_at;
 
     public Booking(int id, int customer_id, int room_id, int payment_id, Date check_in_date, Date check_out_date, int price, BookingStatus status, Date created_at, Date updated_at) {
         this.id = id;
@@ -93,5 +96,12 @@ public class Booking {
         this.hotel_id = hotel_id;
         this.temp_price = temp_price;
         this.review = review;
+    }
+
+    public Booking(String room_type_id, TransactionStatus transactionStatus, int amount, Date paid_at) {
+        this.room_type_id = room_type_id;
+        this.transactionStatus = transactionStatus;
+        this.amount = amount;
+        this.paid_at = paid_at;
     }
 }

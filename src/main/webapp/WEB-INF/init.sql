@@ -367,3 +367,4 @@ INSERT INTO reviews (id, customer_id, booking_id, rating, comment, created_at) V
 INSERT INTO reviews (id, customer_id, booking_id, rating, comment, created_at) VALUES (10, 4, 11, 2, N'tệ quá :(', N'2024-10-31 22:41:28.367');
 SET IDENTITY_INSERT reviews OFF;
 
+select room_type_id, transactionStatus, price, paid_at from bookings inner join payments on bookings.payment_id = payments.id inner join rooms on bookings.room_id = rooms.id where hotel_id = 1

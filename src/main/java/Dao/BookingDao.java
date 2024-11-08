@@ -3,6 +3,7 @@ package Dao;
 import Model.Booking;
 import Model.BookingStatus;
 import Model.Review;
+import Model.TransactionStatus;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -180,6 +181,28 @@ public class BookingDao {
             return DBContext.executeUpdate("update bookings set is_checked_in = ~is_checked_in where id = ?;", new String[]{booking_id});
         } else {
             return DBContext.executeUpdate("update bookings set is_checked_out = ~is_checked_out where id = ?;", new String[]{booking_id});
+        }
+    }
+
+    public static ArrayList<Booking> getAllBookingsOfHotelStatistic(String hotel_id){
+        try {
+            String sql = "select room_type_id, transactionStatus, price, paid_at from bookings inner join payments on bookings.payment_id = payments.id inner join rooms on bookings.room_id = rooms.id where hotel_id = ?;";
+            PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
+            preparedStatement.setString(1, hotel_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ArrayList<Booking> bookings = new ArrayList<>();
+            while (resultSet.next()) {
+                bookings.add(new Booking(
+                        resultSet.getString("room_type_id"),
+                        TransactionStatus.fromCode(resultSet.getString("transactionStatus")),
+                        resultSet.getInt("price"),
+                        resultSet.getTimestamp("paid_at")
+                ));
+            }
+            return bookings;
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 }

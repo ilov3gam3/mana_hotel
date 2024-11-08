@@ -1,5 +1,6 @@
 package Dao;
 
+import Controller.MyWebSocket;
 import Controller.PaymentController;
 import Model.*;
 
@@ -49,6 +50,11 @@ public class PaymentDao {
                         sql_params[i * 5 + 2] = formattedDateTime;
                         sql_params[i * 5 + 3] = BookingStatus.PAID.text;
                         sql_params[i * 5 + 4] = booking_ids[i];
+                    }
+                    Customer customer = CustomerDao.getCustomerWithId(Integer.parseInt(customer_id));
+                    assert customer != null;
+                    for (int i = 0; i < bookings.size(); i++) {
+                        MyWebSocket.broadcastToChannel( bookings.get(i).hotel_id, customer.name + " vừa thanh toán 1 đơn đặt phòng, vui lòng kiểm tra.");
                     }
                     return DBContext.executeUpdate(sql, sql_params);
                 } else {

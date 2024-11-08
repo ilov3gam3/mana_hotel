@@ -116,7 +116,6 @@
         el: "#app",
         data: {
             key: 0,
-            bookings: [],
             payments: [],
             roomTypes: [],
             rooms: [],
@@ -137,15 +136,11 @@
             get_data(){
                 axios.get('<%=request.getContextPath()%>/hotel/api/hotel-get-statistics-data')
                     .then((res) => {
-                        this.payments = JSON.parse(res.data.payments)
+                        this.payments = JSON.parse(res.data.bookings)
                         this.roomTypes = JSON.parse(res.data.roomTypes)
-                        this.bookings = JSON.parse(res.data.bookings)
                         for (let i = 0; i < this.roomTypes.length; i++) {
                             this.roomTypes[i].selected = false
                         }
-                        console.log(this.payments)
-                        console.log(this.roomTypes)
-                        console.log(this.bookings)
                         this.init_line_chart_revenue()
                     })
             },
@@ -158,22 +153,22 @@
                         let temp = 0
                         for (let j = 0; j < this.payments.length; j++) {
                             if (this.bar_chart_revenue_from_date === '' && this.bar_chart_revenue_to_date === ''){
-                                if (this.payments[j].room_type_id === this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
+                                if (this.payments[j].room_type_id == this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
                                     temp += this.payments[j].amount
                                 }
                             } else {
                                 let from_date = new Date(this.bar_chart_revenue_from_date);
                                 let to_date = new Date(this.bar_chart_revenue_to_date);
                                 if (isNaN(from_date) && !isNaN(to_date)){
-                                    if (to_date > new Date(this.payments[j].paid_at) && this.payments[j].room_type_id === this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
+                                    if (to_date > new Date(this.payments[j].paid_at) && this.payments[j].room_type_id == this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
                                         temp += this.payments[j].amount
                                     }
                                 } else if (!isNaN(from_date) && isNaN(to_date)){
-                                    if (from_date < new Date(this.payments[j].paid_at) && this.payments[j].room_type_id === this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
+                                    if (from_date < new Date(this.payments[j].paid_at) && this.payments[j].room_type_id == this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
                                         temp += this.payments[j].amount
                                     }
                                 } else {
-                                    if (to_date > new Date(this.payments[j].paid_at) && from_date < new Date(this.payments[j].paid_at) && this.payments[j].room_type_id === this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
+                                    if (to_date > new Date(this.payments[j].paid_at) && from_date < new Date(this.payments[j].paid_at) && this.payments[j].room_type_id == this.roomTypes[i].id && this.payments[j].transactionStatus === 'SUCCESS'){
                                         temp += this.payments[j].amount
                                     }
                                 }
@@ -251,7 +246,7 @@
                         let array_month_amount = new Array(12).fill(0);
                         for (let j = 0; j < this.payments.length; j++){
                             let temp_date = new Date(this.payments[j].paid_at)
-                            if (temp_date.getFullYear() === parseInt(this.revenue_chart_year) && this.payments[j].room_type_id === this.roomTypes[i].id){
+                            if (temp_date.getFullYear() === parseInt(this.revenue_chart_year) && this.payments[j].room_type_id == this.roomTypes[i].id){
                                 array_month_amount[temp_date.getMonth()] += this.payments[j].amount
                             }
                         }
