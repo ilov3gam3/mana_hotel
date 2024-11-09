@@ -368,3 +368,39 @@ INSERT INTO reviews (id, customer_id, booking_id, rating, comment, created_at) V
 SET IDENTITY_INSERT reviews OFF;
 
 select room_type_id, transactionStatus, price, paid_at from bookings inner join payments on bookings.payment_id = payments.id inner join rooms on bookings.room_id = rooms.id where hotel_id = 1
+
+
+WITH UtilityAggregates AS (SELECT rt.id                                   AS room_type_id,
+                                  STRING_AGG(CAST(u.id AS NVARCHAR), ',') AS utility_ids,
+                                  STRING_AGG(u.name, ',')                 AS utility_names
+                           FROM room_types rt
+                                    LEFT JOIN room_types_has_utilities rtu ON rt.id = rtu.room_type_id
+                                    LEFT JOIN utilities u ON rtu.utility_id = u.id
+                           GROUP BY rt.id),
+     ImageAggregates AS (SELECT rt.id                                   AS room_type_id,
+                                STRING_AGG(CAST(i.id AS NVARCHAR), ',') AS image_ids,
+                                STRING_AGG(i.url, ',')                  AS image_urls
+                         FROM room_types rt
+                                  LEFT JOIN room_type_has_images rti ON rt.id = rti.room_type_id
+                                  LEFT JOIN images i ON rti.image_id = i.id
+                         GROUP BY rt.id)
+SELECT rt.id          AS room_type_id,
+       rt.hotel_id    AS hotel_id,
+       hotels.name as hotel_name,
+       rt.name        AS room_type_name,
+       rt.description AS room_type_description,
+       rt.beds,
+       rt.area,
+       rt.price,
+       ua.utility_ids,
+       ua.utility_names,
+       ia.image_ids,
+       ia.image_urls,
+       (select count(bookings.id) from bookings inner join rooms on bookings.room_id = rooms.id where bookings.payment_id is not null and rooms.room_type_id = rt.id) as booked,
+       (select avg(reviews.rating) from reviews inner join bookings on reviews.booking_id = bookings.id inner join rooms on bookings.room_id = rooms.id where rooms.room_type_id = rt.id) as rating
+FROM room_types rt
+         LEFT JOIN UtilityAggregates ua ON rt.id = ua.room_type_id
+         LEFT JOIN ImageAggregates ia ON rt.id = ia.room_type_id
+         JOIN room_types_has_utilities rtu ON rt.id = rtu.room_type_id
+         Join hotels on rt.hotel_id = hotels.id
+where 1 = 1 and (rt.name like ? or description like ?) and price >= ? and price <= ? group by rt.id, rt.hotel_id, rt.name, rt.description, rt.beds, rt.area, rt.price, ua.utility_ids, ua.utility_names, ia.image_ids, ia.image_urls, hotels.name

@@ -237,7 +237,7 @@ public class RoomTypeDao {
                 sql += " and price >= ?";
                 params.add(priceFrom);
             }
-            if (priceTo != null && !priceFrom.isEmpty()) {
+            if (priceTo != null && !priceTo.isEmpty()) {
                 sql += " and price <= ?";
                 params.add(priceTo);
             }

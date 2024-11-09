@@ -5,13 +5,16 @@
 <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="<%=request.getContextPath() + "/search"%>">
-                <i class="bi bi-search"></i>
-                <span>Tìm kiếm phòng</span>
-            </a>
-        </li>
+        <% if (admin_id_side_bar == null || hotel_id_side_bar == null){ %>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="<%=request.getContextPath() + "/search"%>">
+                    <i class="bi bi-search"></i>
+                    <span>Tìm kiếm phòng</span>
+                </a>
+            </li>
+        <% } %>
         <% if (customer_id_side_bar != null) { %>
+
         <li class="nav-item">
             <a class="nav-link collapsed" href="<%=request.getContextPath() + "/customer/profile"%>">
                 <i class="bi bi-person"></i>
