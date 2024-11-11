@@ -75,7 +75,7 @@ public class RoomDao {
     }
     public static ArrayList<Room> getAvailableRoom(String from_date, String to_date, String room_type_id) {
         try {
-            String sql = "select rooms.* from rooms inner join room_types on rooms.room_type_id = room_types.id where room_type_id = ? and rooms.id not in (select bookings.room_id from bookings where payment_id is not null and check_in_date < ? and check_out_date > ?);";
+            String sql = "select rooms.* from rooms inner join room_types on rooms.room_type_id = room_types.id where room_type_id = ? and hidden = 0 and rooms.id not in (select bookings.room_id from bookings where payment_id is not null and check_in_date < ? and check_out_date > ?);";
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
             preparedStatement.setString(1, room_type_id);
             preparedStatement.setString(2, to_date);

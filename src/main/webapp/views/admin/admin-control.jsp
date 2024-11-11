@@ -119,6 +119,7 @@
                             <td><%=admins.get(i).created_at%></td>
                             <td>
                                 <button id="<%=admins.get(i).id%>" onclick="update_modal_value(<%=admins.get(i).id%>, '<%=admins.get(i).name%>', '<%=admins.get(i).username%>')" data-bs-toggle="modal" data-bs-target="#update_admin" type="button" class="btn btn-warning">Cập nhật</button>
+                                <a href="<%=request.getContextPath()%>/admin/delete-admin?admin_id=<%=admins.get(i).id%>"><button type="button" class="btn btn-warning">Xóa</button></a>
                             </td>
                         </tr>
                     <% } %>

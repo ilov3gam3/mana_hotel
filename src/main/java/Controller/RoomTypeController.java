@@ -104,26 +104,44 @@ public class RoomTypeController {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             String id = req.getParameter("id");
             RoomType roomType = RoomTypeDao.getRoomTypeWithId(id);
-            req.setAttribute("roomType", roomType);
-            Hotel hotel = HotelDao.getHotelWithId(roomType.hotel_id);
-            req.setAttribute("hotel", hotel);
-            if (req.getParameter("from_date") != null && req.getParameter("to_date") != null) {
-                String from_date = req.getParameter("from_date");
-                if (isDateInFuture(from_date)) {
-                    String to_date = req.getParameter("to_date");
-                    if (isFromDateBeforeToDate(from_date, to_date)) {
-                        ArrayList<Room> rooms = RoomDao.getAvailableRoom(from_date, to_date, id);
-                        req.setAttribute("rooms", rooms);
+            if (roomType == null){
+                req.getSession().setAttribute("mess", "error|Phòng này không tồn tại.");
+                resp.sendRedirect(req.getContextPath() + "/search");
+            } else {
+                req.setAttribute("roomType", roomType);
+                Hotel hotel = HotelDao.getHotelWithId(roomType.hotel_id);
+                req.setAttribute("hotel", hotel);
+                if (req.getParameter("from_date") != null && req.getParameter("to_date") != null) {
+                    String from_date = req.getParameter("from_date");
+                    if (isDateInFuture(from_date)) {
+                        String to_date = req.getParameter("to_date");
+                        if (isFromDateBeforeToDate(from_date, to_date)) {
+                            ArrayList<Room> rooms = RoomDao.getAvailableRoom(from_date, to_date, id);
+                            req.setAttribute("rooms", rooms);
+                        } else {
+                            req.setAttribute("warning", "Ngày bắt đầu phải trước ngày kết thúc");
+                        }
                     } else {
-                        req.setAttribute("warning", "Ngày bắt đầu phải trước ngày kết thúc");
+                        req.setAttribute("warning", "Ngày bắt đầu không được ở trong quá khứ");
                     }
-                } else {
-                    req.setAttribute("warning", "Ngày bắt đầu không được ở trong quá khứ");
                 }
+                ArrayList<Review> reviews = ReviewDao.getAllReviewsOfARoomType(id);
+                req.setAttribute("reviews", reviews);
+                req.getRequestDispatcher("/views/public/room-type.jsp").forward(req, resp);
             }
-            ArrayList<Review> reviews = ReviewDao.getAllReviewsOfARoomType(id);
-            req.setAttribute("reviews", reviews);
-            req.getRequestDispatcher("/views/public/room-type.jsp").forward(req, resp);
+        }
+    }
+    @WebServlet("/hotel/change-room-type-hidden")
+    public static class ChangeRoomTypeHidden extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String room_type_id = req.getParameter("room_type_id");
+            if (RoomTypeDao.changeHidden(room_type_id)){
+                req.getSession().setAttribute("mess", "success|Cập nhật thành công.");
+            } else {
+                req.getSession().setAttribute("mess", "error|Lỗi hệ thống");
+            }
+            resp.sendRedirect(req.getContextPath() + "/hotel/manage-room-type");
         }
     }
 }

@@ -120,4 +120,22 @@ public class AdminController {
             }
         }
     }
+    @WebServlet("/admin/delete-admin")
+    public static class deleteAdmin extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String admin_id = req.getParameter("admin_id");
+            String current_admin_id = req.getSession().getAttribute("admin").toString();
+            if (admin_id.equals(current_admin_id)) {
+                req.getSession().setAttribute("mess", "warning|Bạn không thể xóa chỉnh bản thân.");
+            } else {
+                if (AdminDao.deleteAdmin(admin_id)) {
+                    req.getSession().setAttribute("mess", "success|Xóa thành công.");
+                } else {
+                    req.getSession().setAttribute("mess", "error|Lỗi hệ thống.");
+                }
+            }
+            resp.sendRedirect(req.getContextPath() + "/admin/admin-control");
+        }
+    }
 }

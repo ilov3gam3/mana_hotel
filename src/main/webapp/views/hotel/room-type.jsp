@@ -207,6 +207,7 @@
                     <th>Số giường</th>
                     <th>Diện tích</th>
                     <th>Giá</th>
+                    <th>Bị ẩn</th>
                     <th>Cập nhật</th>
                 </tr>
                 </thead>
@@ -220,6 +221,17 @@
                     <td><%=roomTypes.get(i).beds%></td>
                     <td><%=roomTypes.get(i).area%></td>
                     <td><%=roomTypes.get(i).price%></td>
+                    <td>
+                        <% if (roomTypes.get(i).hidden) { %>
+                            <a href="<%=request.getContextPath()%>/hotel/change-room-type-hidden?room_type_id=<%=roomTypes.get(i).id%>">
+                                <button class="btn btn-success">Bỏ ẩn</button>
+                            </a>
+                        <% } else { %>
+                            <a href="<%=request.getContextPath()%>/hotel/change-room-type-hidden?room_type_id=<%=roomTypes.get(i).id%>">
+                                <button class="btn btn-warning">Ẩn</button>
+                            </a>
+                        <% } %>
+                    </td>
                     <td>
                         <button onclick="test('<%=roomTypes.get(i).id%>', '<%=roomTypes.get(i).name%>', '<%=EscapeCharacters.escapeSpecialCharacters(roomTypes.get(i).description)%>', <%=roomTypes.get(i).beds%>, <%=roomTypes.get(i).area%>, <%=roomTypes.get(i).price%>, JSON.parse(`<%=Json.toJson(roomTypes.get(i).images).replace("\"", "&quot;")%>`), JSON.parse(`<%=Json.toJson(roomTypes.get(i).utilities).replace("\"", "&quot;")%>`))" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#verticalycentered2" type="button">Cập nhật</button>
                     </td>

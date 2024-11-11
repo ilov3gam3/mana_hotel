@@ -73,6 +73,7 @@ public class RoomTypeDao {
                     "    rt.beds,\n" +
                     "    rt.area,\n" +
                     "    rt.price,\n" +
+                    "    rt.hidden,\n" +
                     "    ua.utility_ids,\n" +
                     "    ua.utility_names,\n" +
                     "    ia.image_ids,\n" +
@@ -94,7 +95,8 @@ public class RoomTypeDao {
                         resultSet.getFloat("area"),
                         resultSet.getInt("price"),
                         convert2Utility(resultSet.getString("utility_ids"), resultSet.getString("utility_names")),
-                        convert2Image(resultSet.getString("image_ids"), resultSet.getString("image_urls"))
+                        convert2Image(resultSet.getString("image_ids"), resultSet.getString("image_urls")),
+                        resultSet.getBoolean("hidden")
                 ));
             }
             return roomTypes;
@@ -226,7 +228,7 @@ public class RoomTypeDao {
                     "         LEFT JOIN ImageAggregates ia ON rt.id = ia.room_type_id\n" +
                     "         JOIN room_types_has_utilities rtu ON rt.id = rtu.room_type_id\n" +
                     "         Join hotels on rt.hotel_id = hotels.id\n" +
-                    "where 1 = 1";
+                    "where 1 = 1 and rt.hidden = 0";
             ArrayList<String> params = new ArrayList<>();
             if (query != null && !query.isEmpty()) {
                 sql += " and (rt.name like ? or description like ?)";
@@ -353,7 +355,7 @@ public class RoomTypeDao {
                     "FROM room_types rt\n" +
                     "         LEFT JOIN UtilityAggregates ua ON rt.id = ua.room_type_id\n" +
                     "         LEFT JOIN ImageAggregates ia ON rt.id = ia.room_type_id\n" +
-                    "where rt.id = ?;");
+                    "where rt.id = ? and rt.hidden = 0;");
             preparedStatement.setString(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -496,5 +498,9 @@ public class RoomTypeDao {
             e.printStackTrace();
             return new ArrayList<>();
         }
+    }
+
+    public static boolean changeHidden(String room_type_id){
+        return DBContext.executeUpdate("update room_types set hidden = ~hidden where id = ?", new String[]{room_type_id});
     }
 }

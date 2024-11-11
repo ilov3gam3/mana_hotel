@@ -86,4 +86,7 @@ public class AdminDao {
             return DBContext.executeUpdate("update admins set name = ?, username = ? where id = ?", new String[]{name, username, id});
         }
     }
+    public static boolean deleteAdmin(String admin_id){
+        return DBContext.executeUpdate("delete from admins where id = ?", new String[]{admin_id});
+    }
 }

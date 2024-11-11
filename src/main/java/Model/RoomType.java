@@ -15,7 +15,20 @@ public class RoomType {
     public Image[] images;
     public String booked;
     public String rating;
+    public boolean hidden;
 
+    public RoomType(int id, int hotel_id, String name, String description, int beds, float area, int price, Utility[] utilities, Image[] images, boolean hidden) {
+        this.id = id;
+        this.hotel_id = hotel_id;
+        this.name = name;
+        this.description = description;
+        this.beds = beds;
+        this.area = area;
+        this.price = price;
+        this.utilities = utilities;
+        this.images = images;
+        this.hidden = hidden;
+    }
     public RoomType(int id, int hotel_id, String name, String description, int beds, float area, int price, Utility[] utilities, Image[] images) {
         this.id = id;
         this.hotel_id = hotel_id;

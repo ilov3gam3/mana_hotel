@@ -5,7 +5,7 @@
 <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-        <% if (admin_id_side_bar == null || hotel_id_side_bar == null){ %>
+        <% if (admin_id_side_bar == null && hotel_id_side_bar == null){ %>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="<%=request.getContextPath() + "/search"%>">
                     <i class="bi bi-search"></i>

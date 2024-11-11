@@ -19,6 +19,7 @@
         <filter-name>HotelFilter</filter-name>
         <filter-class>Filter.HotelFilter</filter-class>
     </filter>
+
     <filter-mapping>
         <filter-name>AllRouteFilter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -43,4 +44,17 @@
     <session-config>
         <session-timeout>-1</session-timeout>
     </session-config>
+
+<!--
+Servlet gửi data ra jsp:request.setAttribute
+jsp muốn lấy data: request.getAttribute
+
+/customer/get-vnpay-url : lấy link thanh toán
+tuy cập link thanh toán (vnpay)
+vnpay redirect tới /customer/vnpay-result
+
+login gg
+vô trang đăng nhập của gg
+gg -> /login-google -> dung gg client lấy thông tin user
+-->
 </web-app>
