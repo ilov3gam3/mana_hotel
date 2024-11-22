@@ -128,12 +128,15 @@ public class BookingDao {
                     "       booking_id,\n" +
                     "       rating,\n" +
                     "       comment,\n" +
-                    "       reviews.created_at as review_created_at\n" +
+                    "       reviews.created_at as review_created_at,\n" +
+                    "       bookings.customer_id as customer_id,\n" +
+                    "       customers.email as customer_email\n" +
                     "from bookings\n" +
                     "         inner join rooms on bookings.room_id = rooms.id\n" +
                     "         inner join room_types on rooms.room_type_id = room_types.id\n" +
                     "         inner join hotels on room_types.hotel_id = hotels.id\n" +
                     "         left join reviews on bookings.id = reviews.booking_id\n" +
+                    "         inner join customers on bookings.customer_id = customers.id\n" +
                     "where rooms.hotel_id = ? order by id desc;";
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
             preparedStatement.setString(1, hotel_id);
@@ -166,7 +169,8 @@ public class BookingDao {
                         ),
                         resultSet.getBoolean("is_checked_in"),
                         resultSet.getBoolean("is_checked_out"),
-                        resultSet.getString("room_number")
+                        resultSet.getString("room_number"),
+                        resultSet.getString("customer_email")
                 ));
             }
             return bookings;

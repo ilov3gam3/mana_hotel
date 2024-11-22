@@ -2,11 +2,9 @@ package Controller;
 
 import Dao.BookingDao;
 import Dao.HotelDao;
-import Dao.PaymentDao;
 import Dao.RoomTypeDao;
 import Model.Booking;
 import Model.Hotel;
-import Model.Payment;
 import Model.RoomType;
 import Util.UploadImage;
 import com.google.gson.Gson;

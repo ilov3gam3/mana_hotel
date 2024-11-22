@@ -1,15 +1,11 @@
 package Dao;
 
-import Controller.RoomTypeController;
 import Util.Config;
-import org.checkerframework.checker.units.qual.A;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
 
 public class DBContext {
     public static Connection getConnection(){
@@ -94,8 +90,5 @@ public class DBContext {
             e.printStackTrace();
             return false;
         }
-    }
-    public static void main(String[] args) throws SQLException {
-        
     }
 }

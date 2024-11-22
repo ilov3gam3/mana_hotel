@@ -412,7 +412,7 @@ public class RoomTypeDao {
                     "         LEFT JOIN ImageAggregates ia ON rt.id = ia.room_type_id\n" +
                     "         JOIN room_types_has_utilities rtu ON rt.id = rtu.room_type_id\n" +
                     "         Join hotels on rt.hotel_id = hotels.id\n" +
-                    "where 1 = 1 group by rt.id, rt.hotel_id, rt.name, rt.description, rt.beds, rt.area, rt.price, ua.utility_ids, ua.utility_names, ia.image_ids, ia.image_urls, hotels.name ORDER BY rating DESC;";
+                    "where rt.hidden = 'false' group by rt.id, rt.hotel_id, rt.name, rt.description, rt.beds, rt.area, rt.price, ua.utility_ids, ua.utility_names, ia.image_ids, ia.image_urls, hotels.name ORDER BY rating DESC;";
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
             ArrayList<RoomType> roomTypes = new ArrayList<>();
@@ -473,7 +473,7 @@ public class RoomTypeDao {
                     "         LEFT JOIN ImageAggregates ia ON rt.id = ia.room_type_id\n" +
                     "         JOIN room_types_has_utilities rtu ON rt.id = rtu.room_type_id\n" +
                     "         Join hotels on rt.hotel_id = hotels.id\n" +
-                    "where 1 = 1 group by rt.id, rt.hotel_id, rt.name, rt.description, rt.beds, rt.area, rt.price, ua.utility_ids, ua.utility_names, ia.image_ids, ia.image_urls, hotels.name ORDER BY booked DESC;";
+                    "where rt.hidden = 'false' group by rt.id, rt.hotel_id, rt.name, rt.description, rt.beds, rt.area, rt.price, ua.utility_ids, ua.utility_names, ia.image_ids, ia.image_urls, hotels.name ORDER BY booked DESC;";
             PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
             ArrayList<RoomType> roomTypes = new ArrayList<>();

@@ -1,13 +1,9 @@
 package Controller;
 
-import Dao.DBContext;
-import Dao.RoomDao;
 import Dao.RoomTypeDao;
 import Dao.UtilityDao;
-import Model.Room;
 import Model.RoomType;
 import Model.Utility;
-import Util.UploadImage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,8 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class HomeController {

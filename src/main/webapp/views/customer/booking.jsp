@@ -92,7 +92,7 @@
                     <% ArrayList<Booking> bookings = (ArrayList<Booking>) request.getAttribute("bookings");%>
                     <% for (int i = 0; i < bookings.size(); i++) { %>
                         <tr>
-                            <td><input class="form-check-input" name="myCheckbox" type="checkbox" value="<%=bookings.get(i).id%>" <%=bookings.get(i).payment_id != 0 && bookings.get(i).status != BookingStatus.NOT_PAID ? "disabled" : ""%>></td>
+                            <td><input class="form-check-input" name="myCheckbox" <%=bookings.get(i).status != BookingStatus.NOT_PAID ? "disabled" : ""%> type="checkbox" value="<%=bookings.get(i).id%>" <%=bookings.get(i).payment_id != 0 && bookings.get(i).status != BookingStatus.NOT_PAID ? "disabled" : ""%>></td>
                             <td><%=bookings.get(i).id%></td>
                             <td><%=bookings.get(i).room_type_name%></td>
                             <td><%=bookings.get(i).hotel_name%></td>
@@ -132,11 +132,11 @@
                                     <div class="col-12 row m-1">
                                         <form>
                                             <% if (bookings.get(i).review.id == 0) { %>
-                                                <button onclick="addBookingIdReviewForm(<%=bookings.get(i).id%>)" data-bs-toggle="modal" data-bs-target="#review_form" type="button" style="width: 100%" class="btn btn-success">
+                                                <button id="<%=bookings.get(i).id%>" onclick="addBookingIdReviewForm(<%=bookings.get(i).id%>, '<%=bookings.get(i).hotel_name%>', '<%=bookings.get(i).room_type_name%>', '<%=bookings.get(i).room_number%>')" data-bs-toggle="modal" data-bs-target="#review_form" type="button" style="width: 100%" class="btn btn-success">
                                                     Viết đánh giá
                                                 </button>
                                             <% } else { %>
-                                                <button onclick="setValueUpdateModal(<%=bookings.get(i).id%>, <%=bookings.get(i).review.rating%>, '<%=bookings.get(i).review.comment%>', <%=bookings.get(i).review.id%>)" data-bs-toggle="modal" data-bs-target="#update_review_form" type="button" style="width: 100%" class="btn btn-warning">
+                                                <button onclick="setValueUpdateModal(<%=bookings.get(i).id%>, <%=bookings.get(i).review.rating%>, '<%=bookings.get(i).review.comment%>', <%=bookings.get(i).review.id%>, '<%=bookings.get(i).hotel_name%>', '<%=bookings.get(i).room_type_name%>', '<%=bookings.get(i).room_number%>')" data-bs-toggle="modal" data-bs-target="#update_review_form" type="button" style="width: 100%" class="btn btn-warning">
                                                     Cập nhật đánh giá
                                                 </button>
                                             <% } %>
@@ -153,10 +153,11 @@
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Viết đánh giá</h5>
+                        <h5 class="modal-title">Viết đánh giá</h5><br>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form action="<%=request.getContextPath()%>/customer/add-review" method="post">
+                        <p style="margin-left: 50px" id="review_title"></p>
                         <input type="hidden" name="booking_id" id="booking_id">
                         <div class="modal-body">
                             <div class="col-12 row">
@@ -203,6 +204,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form action="<%=request.getContextPath()%>/customer/update-review" method="post">
+                        <p style="margin-left: 50px" id="review_title_update"></p>
                         <input type="hidden" name="booking_id" id="update_booking_id">
                         <input type="hidden" name="review_id" id="update_review_id">
                         <div class="modal-body">
@@ -254,6 +256,17 @@
 
 </body>
 <script>
+    const queryString = window.location.search;
+    const bookingIds = queryString.match(/booking_id=(\d+)/g)?.map(param => parseInt(param.split('=')[1], 10)) || [];
+    const reviewBookingId = new URLSearchParams(queryString).get("review_booking_id")
+    if (reviewBookingId){
+        $("#" + reviewBookingId).click()
+    }
+    if (bookingIds.length > 0) {
+        for (let i = 0; i < bookingIds.length; i++) {
+            checkCheckbox(bookingIds[i])
+        }
+    }
     function getVnpayUrl() {
         if (getCheckboxData() === ''){
             toastr.warning("Bạn chưa chọn phòng nào để thanh toaán.")
@@ -282,14 +295,16 @@
         return false;
         }
     }
-    function addBookingIdReviewForm(id) {
+    function addBookingIdReviewForm(id, hotel_name, room_type_name, room_number) {
         $("#booking_id").val(id)
+        $("#review_title").text("Khách sạn " + hotel_name + ", phòng " + room_type_name + ", phòng " + room_number)
     }
-    function setValueUpdateModal(booking_id, rate, comment, review_id) {
+    function setValueUpdateModal(booking_id, rate, comment, review_id, hotel_name, room_type_name, room_number) {
         $("#update_booking_id").val(booking_id)
         $(`input[name="rate"][value="`+rate+`"]`).prop("checked", true)
         $("#update_comment").val(comment)
         $("#update_review_id").val(review_id)
+        $("#review_title_update").text("Khách sạn " + hotel_name + ", phòng " + room_type_name + ", phòng " + room_number)
     }
     function getCheckboxData() {
         const checkboxes = document.querySelectorAll('input[name="myCheckbox"]:checked');
@@ -297,12 +312,17 @@
         return selectedValues.join(',');
     }
     function checkCheckbox(value) {
-        const checkbox = document.querySelector(`input[name="myCheckbox"][value="`+value+`"]`);
+        const checkbox = document.querySelector(`input[name="myCheckbox"][value="` + value + `"]`);
         if (checkbox) {
-            checkbox.checked = !checkbox.checked;
+            if (!checkbox.disabled) {
+                checkbox.checked = !checkbox.checked;
+            } else {
+                console.log("Checkbox with value " + value + " is disabled.");
+            }
         } else {
             console.log("Checkbox with value " + value + " not found.");
         }
     }
+
 </script>
 </html>

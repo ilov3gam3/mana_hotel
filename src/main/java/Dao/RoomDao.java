@@ -137,4 +137,37 @@ public class RoomDao {
             return false;
         }
     }
+    public static ArrayList<Integer> getLastBookingOfUsers(String customer_id, String[] room_ids){
+        try {
+            String sql = "select top " + room_ids.length + " id from bookings where customer_id = ? and room_id in xxx order by id desc;";
+            String in = "(";
+            for (int i = 0; i < room_ids.length; i++) {
+                if (i == room_ids.length - 1) {
+                    in += "?";
+                } else {
+                    in += "?, ";
+                }
+            }
+            in += ")";
+            sql = sql.replace("xxx", in); // Update the SQL query with the correct `in` clause
+
+            PreparedStatement preparedStatement = DBContext.getConnection().prepareStatement(sql);
+            preparedStatement.setInt(1, Integer.parseInt(customer_id)); // Set the first parameter for customer_id
+
+            for (int i = 0; i < room_ids.length; i++) {
+                preparedStatement.setString(i + 2, room_ids[i]); // Set room_ids, starting at index 2
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ArrayList<Integer> booking_ids = new ArrayList<>();
+            while (resultSet.next()) {
+                booking_ids.add(resultSet.getInt("id"));
+            }
+            return booking_ids;
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 }

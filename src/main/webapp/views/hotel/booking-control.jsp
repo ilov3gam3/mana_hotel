@@ -1,7 +1,7 @@
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="Model.Booking" %>
 <%@ page import="Dao.BookingDao" %>
 <%@ page import="Controller.PaymentController" %>
+<%@ page import="Model.*" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,6 +34,7 @@
                         <th>ID</th>
                         <th>Loại phòng</th>
                         <th>Số phòng</th>
+                        <th>Người đặt</th>
                         <th>Ngày check in</th>
                         <th>Ngày check out</th>
                         <th>Trạng thái check in</th>
@@ -49,25 +50,30 @@
                             <td><%=bookings.get(i).id%></td>
                             <td><%=bookings.get(i).room_type_name%></td>
                             <td><%=bookings.get(i).room_number%></td>
+                            <td><%=bookings.get(i).customer_email%></td>
                             <td><%=bookings.get(i).check_in_date.toString().replace("00:00:00.0", "")%></td>
                             <td><%=bookings.get(i).check_out_date.toString().replace("00:00:00.0", "")%></td>
                             <td>
-                                <a href="<%=request.getContextPath()%>/hotel/change-booking-checkin-checkout?type=checkin&booking_id=<%=bookings.get(i).id%>">
-                                    <% if(bookings.get(i).is_checked_in) { %>
+                                <% if (bookings.get(i).status == BookingStatus.PAID) {%>
+                                    <a href="<%=request.getContextPath()%>/hotel/change-booking-checkin-checkout?type=checkin&booking_id=<%=bookings.get(i).id%>">
+                                        <% if(bookings.get(i).is_checked_in) { %>
                                         <button class="btn btn-danger">Hủy check in</button>
-                                    <% } else { %>
+                                        <% } else { %>
                                         <button class="btn btn-success">Xác nhận check in</button>
-                                    <% } %>
-                                </a>
+                                        <% } %>
+                                    </a>
+                                <% } %>
                             </td>
                             <td>
-                                <a href="<%=request.getContextPath()%>/hotel/change-booking-checkin-checkout?type=checkout&booking_id=<%=bookings.get(i).id%>">
-                                    <% if(bookings.get(i).is_checked_out) { %>
-                                        <button class="btn btn-danger">Hủy check out</button>
-                                    <% } else { %>
-                                        <button class="btn btn-success">Xác nhận check out</button>
-                                    <% } %>
-                                </a>
+                                <% if (bookings.get(i).status == BookingStatus.PAID) {%>
+                                    <a href="<%=request.getContextPath()%>/hotel/change-booking-checkin-checkout?type=checkout&booking_id=<%=bookings.get(i).id%>&sendMail=<%=!bookings.get(i).is_checked_out%>">
+                                        <% if(bookings.get(i).is_checked_out) { %>
+                                            <button class="btn btn-danger">Hủy check out</button>
+                                        <% } else { %>
+                                            <button class="btn btn-success">Xác nhận check out</button>
+                                        <% } %>
+                                    </a>
+                                <% } %>
                             </td>
                             <td><%=bookings.get(i).status%></td>
                             <td><%=bookings.get(i).payment_id == 0 ? String.format("%,d", bookings.get(i).temp_price * PaymentController.GetVNPayUrlServlet.countDays(bookings.get(i).check_in_date, bookings.get(i).check_out_date)) : String.format("%,d", bookings.get(i).price)%></td>

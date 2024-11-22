@@ -70,7 +70,7 @@
                 <%=roomTypesTop3Rate.isEmpty() ? "Không tìm thấy phòng nào" : ""%>
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Các phòng có lượt đánh giá tốt nhất</h5>
+                        <h5 class="card-title">Các phòng có nhiều lượt đặt nhất</h5>
                         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                             <% for (int i = 0; i < roomTypesTop3Book.size(); i++) { %>
                             <div class="col">

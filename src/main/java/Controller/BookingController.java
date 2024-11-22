@@ -3,8 +3,8 @@ package Controller;
 
 import Dao.*;
 import Model.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import Util.Config;
+import Util.Mail;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BookingController {
     @WebServlet("/customer/book-room")
@@ -25,6 +27,12 @@ public class BookingController {
             String room_type_id = req.getParameter("room_type_id");
             String customer_id = req.getSession().getAttribute("customer").toString();
             if (RoomDao.bookARoom(room_ids, from_date, to_date, room_type_id, customer_id)){
+                ArrayList<Integer> booking_ids = RoomDao.getLastBookingOfUsers(customer_id, room_ids);
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.submit(() -> {
+                    Mail.sendMailBookingSuccess(customer_id, req.getContextPath(), booking_ids);
+                });
+                executorService.shutdown();
                 req.getSession().setAttribute("mess", "success|Đặt phòng thành công.");
             } else {
                 req.getSession().setAttribute("mess", "error|Đặt phòng không thành công.");
@@ -79,6 +87,23 @@ public class BookingController {
                 req.getSession().setAttribute("mess", "success|Cập nhật thành công");
             } else {
                 req.getSession().setAttribute("mess", "error|Cập nhật không thành công.");
+            }
+            String sendMail = req.getParameter("sendMail");
+            System.out.println(sendMail);
+            if (sendMail!= null){
+                if (sendMail.equals("true")){
+                    System.out.println("sendMail true now");
+                    ExecutorService executorService = Executors.newSingleThreadExecutor();
+                    executorService.submit(() -> {
+                        try {
+                            System.out.println("sending mail");
+                            Mail.sendMailReview(booking_id, req.getContextPath());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    executorService.shutdown();
+                }
             }
             resp.sendRedirect(req.getContextPath() + "/hotel/booking-control");
         }
